@@ -13,6 +13,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [questionNo, setQuestionNo] = useState(1);
   const [isEditing, setIsEditing] = useState(false);
+  const [topic, setTopic] = useState("Java, HTML, CSS, JavaScript");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, topic }),
       });
 
       const data = await response.json();
@@ -110,6 +111,12 @@ export default function Home() {
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="Enter your coding question here..."
             className="min-h-[100px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"
+          />
+          <input
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="Enter your coding question here..."
+            className="min-h-[20px] w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none"
           />
         </div>
         <Button
