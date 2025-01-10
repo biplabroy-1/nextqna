@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 				{
 					role: "system",
 					content:
-						"You are a helpful coding assistant to help java, html, css and javascript. Provide smaller, clear, concise answers to coding questions. just send the codes like a txt also without '```' ",
+						"You are a helpful coding assistant to help java, html, css and javascript. Provide smaller, clear, concise answers to coding questions. just send the codes like a txt also without '```' if it is html css js question then send like this 'HTML: <html> CSS: <style> JAVASCRIPT: <script>'",
 				},
 				{
 					role: "user",

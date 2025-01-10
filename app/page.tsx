@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Download } from "lucide-react";
+import { Loader2, Download, Edit, Save } from "lucide-react";
 import { jsPDF } from "jspdf";
 
 export default function Home() {
@@ -12,6 +12,7 @@ export default function Home() {
   const [answer, setAnswer] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [questionNo, setQuestionNo] = useState(1);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +41,7 @@ export default function Home() {
     const pageHeight = doc.internal.pageSize.height;
     const marginTop = 20;
     let cursorY = marginTop;
-    const lineSpacing = 5; // Reduced line spacing
+    const lineSpacing = 5;
 
     // Add Title
     doc.setFontSize(14);
@@ -140,17 +141,43 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="font-semibold">Answer:</h3>
-                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                  {answer}
-                </p>
+                {isEditing ? (
+                  <Textarea
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    className="min-h-screen p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                  />
+                ) : (
+                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                    {answer}
+                  </p>
+                )}
               </div>
-              <Button
-                onClick={generatePDF}
-                className="w-full py-3 text-lg font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300"
-              >
-                <Download className="mr-2 h-5 w-5" />
-                Download as PDF
-              </Button>
+              <div className="flex space-x-4">
+                <Button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="py-3 text-lg font-medium bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300"
+                >
+                  {isEditing ? (
+                    <>
+                      <Save className="mr-2 h-5 w-5" />
+                      Save Answer
+                    </>
+                  ) : (
+                    <>
+                      <Edit className="mr-2 h-5 w-5" />
+                      Edit Answer
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={generatePDF}
+                  className="py-3 text-lg font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300"
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Download as PDF
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
