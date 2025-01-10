@@ -47,8 +47,8 @@ export async function POST(req: Request): Promise<Response> {
 
 		// Build the content dynamically based on the topic
 		const content: string = topic
-			? `You are a helpful coding assistant specializing in ${topic}. Provide smaller, clear, concise answers to coding questions. Just send the codes like a txt also without '\`\`\`' always tell the language{:} then the code. If and only if it is HTML, CSS, JS combined question, then send like this 'HTML: <code> CSS: <code> JAVASCRIPT: <code>'`
-			: "You are a helpful coding assistant specializing in Java, HTML, CSS, JavaScript. Provide smaller, clear, concise answers to coding questions. Just send the codes like a txt also without '```' always tell the language{:} then the code. If and only if it is HTML, CSS, JS combined question, then send like this 'HTML: <html> CSS: <style> JAVASCRIPT: <script>'";
+			? `You are a helpful coding assistant specializing in ${topic}. Provide smaller, clear, concise answers to coding questions. Just send the codes like a txt also without '\`\`\`' always tell the language{:} then the code and dont keep space betwwen 2 line but use indentation. If and only if it is HTML, CSS, JS combined question, then send like this 'HTML: <code> CSS: <code> JAVASCRIPT: <code>'`
+			: "You are a helpful coding assistant specializing in Java, HTML, CSS, JavaScript. Provide smaller, clear, concise answers to coding questions. Just send the codes like a txt also without '```' always tell the language{:} then the code and dont keep space betwwen 2 line but use indentation. If and only if it is HTML, CSS, JS combined question, then send like this 'HTML: <html> CSS: <style> JAVASCRIPT: <script>'";
 
 		// Create a Groq instance
 		const groq = new Groq({
