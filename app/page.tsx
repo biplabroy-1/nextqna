@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Download, Edit, Save } from "lucide-react";
 import { jsPDF } from "jspdf";
+import CodeResponseDisplay from "./Code";
 
 export default function Home() {
   const [question, setQuestion] = useState("");
@@ -14,6 +15,7 @@ export default function Home() {
   const [questionNo, setQuestionNo] = useState(1);
   const [isEditing, setIsEditing] = useState(false);
   const [topic, setTopic] = useState("Java, HTML, CSS, JavaScript");
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,54 +41,108 @@ export default function Home() {
 
   const generatePDF = () => {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
-    const marginTop = 20;
-    let cursorY = marginTop;
-    const lineSpacing = 5;
+    const margin = 20;
+    let cursorY = margin;
 
-    // Add Title
+    // Reduced line spacing values
+    const normalLineSpacing = 5; // Reduced from 7
+    const titleLineSpacing = 7; // Reduced from 10
+
+    // Set title font
     doc.setFontSize(14);
-    doc.text(`Question No ${questionNo}:`, 10, cursorY);
-    cursorY += lineSpacing * 2;
 
-    // Add Question
+    // Add question number
+    const questionTitle = `Question No ${questionNo}:`;
+    doc.text(questionTitle, margin, cursorY);
+    cursorY += titleLineSpacing;
+
+    // Add question content
     doc.setFontSize(11);
-    const questionLines = doc.splitTextToSize(question, 190);
+    const questionLines = doc.splitTextToSize(question, pageWidth - 2 * margin);
     // biome-ignore lint/complexity/noForEach: <explanation>
     questionLines.forEach((line: string | string[]) => {
-      if (cursorY + lineSpacing > pageHeight - marginTop) {
+      if (cursorY > pageHeight - margin) {
         doc.addPage();
-        cursorY = marginTop;
+        cursorY = margin;
       }
-      doc.text(line, 10, cursorY);
-      cursorY += lineSpacing;
+      doc.text(line, margin, cursorY);
+      cursorY += normalLineSpacing;
     });
 
-    // Add Answer Title
-    cursorY += lineSpacing * 2;
-    if (cursorY > pageHeight - marginTop) {
-      doc.addPage();
-      cursorY = marginTop;
+    cursorY += titleLineSpacing;
+
+    // Check if answer contains code sections
+    if (
+      answer.includes("HTML:") ||
+      answer.includes("CSS:") ||
+      answer.includes("JAVASCRIPT:")
+    ) {
+      const lines = answer.split("\n");
+      let isTitle = false;
+
+      // biome-ignore lint/complexity/noForEach: <explanation>
+      lines.forEach((line) => {
+        if (
+          line.trim() === "HTML:" ||
+          line.trim() === "CSS:" ||
+          line.trim() === "JAVASCRIPT:"
+        ) {
+          // For section titles only
+          if (cursorY > pageHeight - margin) {
+            doc.addPage();
+            cursorY = margin;
+          }
+          doc.setFontSize(16);
+          const titleWidth = doc.getTextWidth(line);
+          const titleX = (pageWidth - titleWidth) / 2;
+          doc.text(line, titleX, cursorY);
+          cursorY += titleLineSpacing;
+          isTitle = true;
+        } else {
+          // For code content - keep original formatting
+          if (cursorY > pageHeight - margin) {
+            doc.addPage();
+            cursorY = margin;
+          }
+          if (isTitle) {
+            doc.setFontSize(11);
+            isTitle = false;
+          }
+          // Only add line spacing for non-empty lines
+          if (line.trim()) {
+            doc.text(line, margin, cursorY);
+            cursorY += normalLineSpacing;
+          } else {
+            // Smaller spacing for empty lines
+            cursorY += normalLineSpacing / 2;
+          }
+        }
+      });
+    } else {
+      // Regular text answer
+      doc.setFontSize(11);
+      const answerLines = doc.splitTextToSize(answer, pageWidth - 2 * margin);
+      // biome-ignore lint/complexity/noForEach: <explanation>
+      answerLines.forEach((line: string | string[]) => {
+        if (cursorY > pageHeight - margin) {
+          doc.addPage();
+          cursorY = margin;
+        }
+        doc.text(line, margin, cursorY);
+        cursorY += normalLineSpacing;
+      });
     }
-    doc.setFontSize(14);
-    doc.text("Answer:", 10, cursorY);
-    cursorY += lineSpacing * 2;
-
-    // Add Answer
-    doc.setFontSize(11);
-    const answerLines = doc.splitTextToSize(answer, 190);
-    // biome-ignore lint/complexity/noForEach: <explanation>
-    answerLines.forEach((line: string | string[]) => {
-      if (cursorY + lineSpacing > pageHeight - marginTop) {
-        doc.addPage();
-        cursorY = marginTop;
-      }
-      doc.text(line, 10, cursorY);
-      cursorY += lineSpacing;
-    });
 
     doc.save(`Question_${questionNo}_Answer.pdf`);
   };
+
+  // Check if the answer contains code sections
+  const hasCodeSections =
+    answer.includes("HTML:") ||
+    answer.includes("CSS:") ||
+    answer.includes("JAVASCRIPT:");
 
   return (
     <main className="container mx-auto p-4 max-w-3xl">
@@ -115,7 +171,7 @@ export default function Home() {
           <input
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            placeholder="Enter your coding question here..."
+            placeholder="Enter topics..."
             className="min-h-[20px] w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none"
           />
         </div>
@@ -152,13 +208,11 @@ export default function Home() {
                   <Textarea
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
-                    className="min-h-screen p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"
+                    className="min-h-[200px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"
                   />
-                ) : (
-                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                    {answer}
-                  </p>
-                )}
+                ) : 
+                  <CodeResponseDisplay codeResponse={answer} />
+                }
               </div>
               <div className="flex space-x-4">
                 <Button
