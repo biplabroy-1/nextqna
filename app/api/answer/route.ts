@@ -50,8 +50,6 @@ export async function POST(req: Request) {
 			stop: null,
 		});
 
-		console.log(completion.choices[0]?.message?.content);
-
 		return Response.json({
 			answer: completion.choices[0]?.message?.content || "No answer generated",
 		});

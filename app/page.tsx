@@ -40,45 +40,47 @@ export default function Home() {
     const pageHeight = doc.internal.pageSize.height;
     const marginTop = 20;
     let cursorY = marginTop;
+    const lineSpacing = 5; // Reduced line spacing
+
     // Add Title
-    doc.setFontSize(18);
+    doc.setFontSize(14);
     doc.text(`Question No ${questionNo}:`, 10, cursorY);
-    cursorY += 10;
+    cursorY += lineSpacing * 2;
 
     // Add Question
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     const questionLines = doc.splitTextToSize(question, 190);
     // biome-ignore lint/complexity/noForEach: <explanation>
     questionLines.forEach((line: string | string[]) => {
-      if (cursorY + 10 > pageHeight - marginTop) {
+      if (cursorY + lineSpacing > pageHeight - marginTop) {
         doc.addPage();
         cursorY = marginTop;
       }
       doc.text(line, 10, cursorY);
-      cursorY += 8;
+      cursorY += lineSpacing;
     });
 
     // Add Answer Title
-    cursorY += 10;
+    cursorY += lineSpacing * 2;
     if (cursorY > pageHeight - marginTop) {
       doc.addPage();
       cursorY = marginTop;
     }
-    doc.setFontSize(18);
+    doc.setFontSize(14);
     doc.text("Answer:", 10, cursorY);
-    cursorY += 10;
+    cursorY += lineSpacing * 2;
 
     // Add Answer
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     const answerLines = doc.splitTextToSize(answer, 190);
     // biome-ignore lint/complexity/noForEach: <explanation>
     answerLines.forEach((line: string | string[]) => {
-      if (cursorY + 10 > pageHeight - marginTop) {
+      if (cursorY + lineSpacing > pageHeight - marginTop) {
         doc.addPage();
         cursorY = marginTop;
       }
       doc.text(line, 10, cursorY);
-      cursorY += 8;
+      cursorY += lineSpacing;
     });
 
     doc.save(`Question_${questionNo}_Answer.pdf`);
