@@ -138,6 +138,12 @@ export default function Home() {
     doc.save(`Question_${questionNo}_Answer.pdf`);
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>)=>{
+    const str = e.target.value;
+    const newStr = str.replace(/\n/g,"")
+    setQuestion(newStr)
+  }
+
   // Check if the answer contains code sections
   const hasCodeSections =
     answer.includes("HTML:") ||
@@ -164,7 +170,7 @@ export default function Home() {
           </label>
           <Textarea
             value={question}
-            onChange={(e) => setQuestion(e.target.value)}
+            onChange={handleChange}
             placeholder="Enter your coding question here..."
             className="min-h-[100px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"
           />
